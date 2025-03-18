@@ -1,7 +1,6 @@
 import streamlit as st
 import sqlite3
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # Database name
 DB_NAME = "nafas.db"
@@ -53,17 +52,11 @@ def fetch_filtered_data(table_name, state_id=None):
     conn.close()
     return df
 
-# Function to plot AQI Yearly data
+# Function to plot AQI Yearly data using Streamlit's native line_chart
 def plot_aqi_yearly(df):
-    if df.empty:
-        return
-    fig, ax = plt.subplots()
-    ax.plot(df["year"], df["aqi"], marker="o", linestyle="-", label="AQI")
-    ax.set_xlabel("Year")
-    ax.set_ylabel("AQI")
-    ax.set_title("AQI Yearly Trend")
-    ax.legend()
-    st.pyplot(fig)
+    if not df.empty:
+        chart_df = df.set_index("year")[["aqi"]]
+        st.line_chart(chart_df)
 
 # Streamlit UI
 st.title("Nafas Database Viewer")
@@ -92,7 +85,7 @@ if table_names:
             st.write(f"Showing data for **{selected_table}**")
             st.dataframe(df)
 
-            # Plot AQI Yearly Trend (Only for aqi_yearly_state)
+            # Plot AQI Yearly Trend using Streamlit's line chart (Only for aqi_yearly_state)
             if selected_table == "aqi_yearly_state":
                 plot_aqi_yearly(df)
 else:
